@@ -1102,11 +1102,11 @@ def render_home():
 
     # ---- HOSTED vs LOCAL BANNER ----
     if IS_HOSTED:
-        st.warning(
-            "🌐 **You're viewing the hosted preview.** Browse freely — but notes, confidence checks, "
-            "and checklist progress **will not save** between sessions.\n\n"
-            "To get the full experience with persistent local storage, "
-            "[set up your own copy →](https://github.com/ajamithos/CM-integration-hub#quick-start---local-install)"
+        st.info(
+            "🌐 You're viewing the hosted preview of this tool for UAT testing. "
+            "Notes, confidence checks, and checklist progress will not save between sessions.\n\n"
+            "The full CM experience is unlocked when engaging with the tool on your local machine — "
+            "[click here to set it up →](https://github.com/ajamithos/CM-integration-hub#quick-start--local-install)"
         )
 
     if not alias:
@@ -1119,7 +1119,7 @@ def render_home():
             "from **Stage 1** through **Stage 3**."
         )
         st.markdown("")
-        st.markdown("**What's inside:**")
+        st.markdown("**How it works:**")
         st.markdown(
             "- ✅ **Campaign Navigation** — when to Ask, Attempt, or Escalate\n"
             "- ✅ **Communication Decision Tree** — who to contact, what channel, what to say\n"
@@ -2757,10 +2757,7 @@ def main():
     if "current_page" not in st.session_state:
         st.session_state["current_page"] = "home"
     # ============================================================
-    # "ASK ZOYLA" — dedicated nav page with embedded iframe
-    # The FAB button navigates to the Ask Zoyla page in the sidebar.
-    # The page renders the QuickSight agent via st.components.v1.iframe
-    # which is the only reliable way to embed external content in Streamlit.
+    # "ASK ZOYLA" — floating action button opens QuickSight Q agent in new tab
     # ============================================================
     st.markdown(f"""
     <style>
@@ -2792,17 +2789,11 @@ def main():
             text-decoration: none !important;
         }}
     </style>
-    <a class="zoyla-fab" href="?page=zoyla" target="_self">
+    <a class="zoyla-fab" href="{ASK_ZOYLA_URL}" target="_blank" rel="noopener noreferrer">
         💬 Ask Zoyla
     </a>
     """, unsafe_allow_html=True)
 
-    # Handle ?page=zoyla query param — navigate to Zoyla page
-    params = st.query_params
-    if params.get("page") == "zoyla":
-        st.session_state["current_page"] = "zoyla"
-        st.query_params.clear()
-        st.rerun()
 
 
 
@@ -2880,8 +2871,6 @@ def main():
         render_notes()
     elif current_page == "docs":
         render_reference_docs()
-    elif current_page == "zoyla":
-        render_zoyla()
 
 
 if __name__ == "__main__":

@@ -60,7 +60,7 @@ In the **Feedback Log** tab of the tracker, one row per finding:
 | 📈 **Progress Report** | Full integration summary — stage, checklist, confidence, scenarios, 1:1 topics |
 | 📝 **My Notebook** | Notes, 1:1 prep, sync agenda generator |
 | 📄 **Reference Documents** | CM-curated docs and quick links |
-| 🤖 **Ask Zoyla** | AI assistant for campaign questions |
+| 💬 **Ask Zoyla** | AI campaign assistant — floating button opens QuickSight Q agent in a new tab |
 
 🌐 **Bilingual** — toggle English / Español in the sidebar.
 
@@ -68,33 +68,30 @@ In the **Feedback Log** tab of the tracker, one row per finding:
 
 ## Quick Start — Local Install
 
-For the full experience with persistent data (notes, confidence history, checklist progress saved permanently):
+For the full experience with persistent data (notes, confidence history, checklist progress saved permanently).
 
-### 1. Install Python (one-time)
-Download from [python.org](https://www.python.org/downloads/) — check **"Add Python to PATH"** during install.
+### Step 1: Download
 
-### 2. Install Git (one-time)
-Download from [git-scm.com](https://git-scm.com/download/win) — click Next through everything with defaults.
+[⬇️ **Download the Hub**](https://github.com/ajamithos/CM-integration-hub/archive/refs/heads/main.zip) → Unzip the folder anywhere on your computer.
 
-### 3. Clone and run
+### Step 2: Launch
 
-```
-git clone https://github.com/ajamithos/CM-integration-hub.git
-cd CM-integration-hub
-pip install streamlit
-streamlit run cm_training_hub.py
-```
+Open the folder and double-click:
+- **Windows:** `launch_hub.bat`
+- **Mac:** `launch_hub.sh`
 
-Browser opens to `http://localhost:8501`. Enter your alias and go.
+The launcher handles everything:
+- ✅ Checks if Python is installed (opens download page if not)
+- ✅ Installs Streamlit automatically (first time only)
+- ✅ Launches the Hub in your browser
 
-### 4. Get latest updates
+That's it. One double-click every time you want to use it.
 
-```
-cd CM-integration-hub
-git pull
-```
+> **First time only:** If Python isn't installed, the launcher will open the download page for you. Install it (check **"Add Python to PATH"**), then double-click the launcher again.
 
-Then relaunch with `streamlit run cm_training_hub.py`.
+### Get latest updates
+
+When Jamie shares a new version, just download the ZIP again. Your personal data (notes, confidence checks) is saved in a separate `data/` folder — it won't be overwritten.
 
 ---
 
