@@ -568,7 +568,6 @@ LANG = {
             ["Notificación de error o riesgo", "Slack DM al CCM", "Directo, privado, permite al CCM decidir los siguientes pasos"],
             ["Resumen de fin de día", "Slack DM al CCM", "La cadencia constante construye confianza"],
             ["Comunicación al cliente (Stage 3)", "Email — usando plantilla aprobada", "Formal, rastreable, alineado con el CCM"]
-            ["Comunicación al cliente (Stage 3)", "Email — usando plantilla aprobada", "Formal, rastreable, alineado con el CCM"]
         ],
         "cdt_stage_caption": "Mostrando guía para: **{}** — cambia tu stage en la barra lateral",
         "cdt_what_happening": "### 📍 ¿Qué está pasando?",
