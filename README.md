@@ -118,4 +118,4 @@ Built for the SJO AdOps → CM transition under Model 2. For questions or update
 
 **Version**: 1.0  
 **Last Updated**: March 9, 2026  
-**Built by**: Orcha 🎯
+**Built by**: Jamie Thomas (ajamitho@)
