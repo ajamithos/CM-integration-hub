@@ -16,6 +16,9 @@ import os
 from datetime import datetime, date
 from pathlib import Path
 
+# Detect if running on Streamlit Cloud vs. locally
+IS_HOSTED = os.environ.get("STREAMLIT_SERVER_HEADLESS") == "true" or os.path.exists("/mount/src")
+
 # ============================================================
 # CONFIGURATION
 # ============================================================
@@ -32,14 +35,14 @@ ASK_ZOYLA_URL = "https://us-east-1.quicksight.aws.amazon.com/sn/account/amazonbi
 # Navigation page definitions — key, icon, English label, Spanish label
 NAV_PAGES = [
     ("home",       "🏠", "Dashboard",                     "Panel"),
-    ("campaign",   "📋", "Campaign Navigation",           "Navegación de Campaña"),
-    ("comms",      "💬", "Communication Tree",            "Árbol de Comunicación"),
+    ("campaign",   "📋", "Navigating Campaign R&Rs",      "Navegando R&Rs de Campaña"),
     ("priority",   "⚡", "Prioritization",                "Priorización"),
+    ("comms",      "💬", "Communication Tree",            "Árbol de Comunicación"),
     ("scenarios",  "🎯", "Scenario Practice",             "Práctica de Escenarios"),
     ("confidence", "📊", "Confidence Check",              "Control de Confianza"),
-    ("progress",   "📈", "Progress Report",               "Informe de Progreso"),
     ("notes",      "📝", "My Notebook",                    "Mi Cuaderno"),
     ("docs",       "📄", "Reference Documents",           "Documentos de Referencia"),
+    ("progress",   "📈", "Progress Report",               "Informe de Progreso"),
 ]
 
 # ============================================================
@@ -63,7 +66,7 @@ LANG = {
         "home_tagline": "Everything you need to work with clarity, consistency, and confidence — in one place.",
         "home_footer": "Built for CMs in Model 2. Your reference from Stage 1 through Stage 3.",
         # -- Campaign Navigation --
-        "cn_title": "Campaign Navigation",
+         "cn_title": "Navigating Campaign R&Rs",
         "cn_subtitle": "Your reference for knowing when to act independently and when to check in.",
         "cn_ask_title": "🔵 ASK",
         "cn_ask_when": "**When to Ask**",
@@ -108,6 +111,133 @@ LANG = {
             "Never change budget allocations without explicit direction",
             "Never use 'Blocked - CCM' status without first attempting to resolve directly"
         ],
+        # -- Campaign Nav: Stage-aware content --
+        "cn_stage_header": "📍 You are in: **{}**",
+        "cn_stage_change": "Change your stage in the sidebar.",
+        "cn_stage1_focus": "Building trust and establishing communication patterns. Your CCM is your primary guide.",
+        "cn_stage2_focus": "You are opening and executing assignments independently. Your CCM provides QA and strategic guidance.",
+        "cn_stage3_focus": "You own your workflows end-to-end. Your partnership with your CCM is collaborative and strategic — not supervisory.",
+        "cn_ask_items_s1": [
+            "First time encountering an assignment type",
+            "Client-facing decisions or communications",
+            "Anything involving budget changes or flight modifications",
+            "When instructions are ambiguous or incomplete",
+            "When a creative asset does not match what the assignment describes",
+            "When you are unsure about an advertiser's specific preferences or history",
+        ],
+        "cn_ask_items_s2": [
+            "New assignment types you have not done independently yet",
+            "Client-facing decisions or direct advertiser communications",
+            "Budget changes, flight modifications, or inventory adjustments",
+            "When instructions are ambiguous and you cannot resolve with the SOP or wiki",
+            "When you are unsure about an advertiser's specific history or preferences",
+        ],
+        "cn_ask_items_s3": [
+            "A genuinely new situation you have not encountered before — novel products, edge cases, unique client requests",
+            "Strategic decisions with direct client or revenue impact",
+            "Cross-account dependencies or conflicts that need alignment",
+            "Situations where the SOP is silent or contradictory",
+        ],
+        "cn_ask_who_s1": "**Who to ask**: Your CCM first. If they are unavailable and it is time-sensitive, your AdOps mentor or M1.",
+        "cn_ask_who_s2": "**Who to ask**: Your CCM for strategic or client-facing decisions. For execution questions, check the SOP first — then your CCM or Account Team.",
+        "cn_ask_who_s3": "**Who to ask**: Your Account Team, M1, or CCM — whoever has the context. You decide who to loop in.",
+        "cn_attempt_items_s1": [
+            "Assignment types you have completed before with QA approval",
+            "Standard trafficking for DSP, Devices, STV, PVa",
+            "Optimizations you have executed previously on this account",
+            "CSU assignments that follow established patterns",
+            "Updating the weekly tracker or shared production matrix",
+            "Routine Slack updates on assignment status",
+        ],
+        "cn_attempt_items_s2": [
+            "All assignment types you have done before — execute independently",
+            "Standard trafficking, optimizations, and CSU workflows",
+            "Routine account team communications about status and timelines",
+            "Troubleshooting delivery or creative issues using the SOP and wiki",
+            "Proactively flagging potential issues to Account Team",
+        ],
+        "cn_attempt_items_s3": [
+            "All assignments within your workflow scope — CSU, Optimization, Trafficking",
+            "Self-QA all your own work before submission",
+            "Account team communications related to your workflow — go-live confirmations, tag receipt, delivery updates",
+            "Troubleshooting and resolving delivery issues end-to-end",
+            "Coaching teammates on workflows, workarounds, and best practices",
+            "Proactively tracking upcoming launches and live order health",
+        ],
+        "cn_attempt_who_s1": "**Then confirm**: Let your CCM know what you did. Your CCM will QA.",
+        "cn_attempt_who_s2": "**Then confirm**: Your CCM reviews high-stakes work. Routine execution is yours.",
+        "cn_attempt_who_s3": "**You own it.** Execute, QA, and communicate autonomously. Loop in your partner when strategic alignment is needed.",
+        "cn_escalate_items_s1": [
+            "You have been blocked for 15+ minutes with no clear path forward",
+            "A campaign is at risk of missing its launch date",
+            "A client-facing error has occurred or may occur",
+            "An SLA is at risk and you cannot resolve the blocker yourself",
+            "You discover a discrepancy between OMS and Rodeo that affects delivery",
+            "Your CCM is unavailable and the issue cannot wait",
+        ],
+        "cn_escalate_items_s2": [
+            "You have been blocked for 15+ minutes with no clear path forward",
+            "A campaign is at risk of missing its launch date or SLA",
+            "A client-facing error has occurred or may occur",
+            "A discrepancy between OMS and Rodeo that you cannot resolve",
+            "Your CCM is unavailable and the issue is time-sensitive",
+        ],
+        "cn_escalate_items_s3": [
+            "A campaign is at risk and you cannot resolve it independently",
+            "A client-facing error with material impact has occurred",
+            "An issue requires cross-account or cross-team coordination beyond your scope",
+            "A decision needs M1 or leadership visibility due to revenue or relationship risk",
+        ],
+        "cn_escalate_who_s1": "**Escalate to**: Your CCM (first), then M1 or Account Team lead if CCM is unavailable.",
+        "cn_escalate_who_s2": "**Escalate to**: Your CCM for client impact. M1 or Account Team lead if CCM is unavailable.",
+        "cn_escalate_who_s3": "**Escalate to**: Whoever has the authority to resolve it — M1, Account Team lead, or your CCM partner.",
+        "cn_guardrails_s3": [
+            "Never modify flight dates without confirming the downstream impact on delivery and pacing",
+            "Never submit work without self-QA — you are your own quality gate",
+            "Never change budget allocations without explicit direction from Account Team or AM",
+            "Never take on cross-account work without confirming bandwidth and visibility with your partner",
+        ],
+        "cn_sop_title": "📋 SOP by Stage of Integration",
+        "cn_sop_source": "From the [US-SJO Workflow SOP — Model 2](https://w.amazon.com/bin/view/Users/ajamitho/CM-UAT-Test/)",
+        "cn_sop_duration": "**Duration:** Roughly 2–3 weeks — the CM will dictate based on confidence level",
+        "cn_sop_s1_focus": "**Focus:** Building trust and establishing communication patterns.",
+        "cn_sop_s2_focus": "**Focus:** CMs begin opening and executing assignments independently while CCMs continue to guide and QA.",
+        "cn_sop_s3_focus": "**Focus:** CMs assume ownership of their workflows. Both partners should be engaging in projects or initiatives together.",
+        "cn_sop_s3_note": "**To be clear:** This is an **equal and collaborative partnership** — CMs are not 'assistants' to CCMs, just as CCMs are not 'assistants' to AEs. We work together, always.",
+        "cn_sop_ccm_title": "#### CCM Responsibilities",
+        "cn_sop_cm_title": "#### CM Responsibilities",
+        "cn_sop_s3_practice_title": "#### What This Looks Like in Practice",
+        "cn_sop_s1_ccm": "- Schedule initial introduction call with CM\n- Align on **daily cadence** — 30–60 min block each morning and afternoon is highly recommended\n- Add CM to relevant account team chats and weekly syncs\n- Introduce CM in Account Team Slack channels\n- Open and assign tasks via Salesforce — **start with one at a time** until all types are covered\n- Have the CM shadow you as you open assignments; be on the call as they execute\n- **QA all CM assignments** (CM will self-QA in a later stage)\n- CC your CM in client communications\n- Provide direct guidance on campaign workflow as assignments come in and issues arise\n- Talk through previous experiences and outcomes",
+        "cn_sop_s1_cm": "- Complete assignments with your CCM's guidance\n- Communicate updates, questions, blockers directly with CCM/Account Team via Slack\n- Consistently document key learnings and processes\n- Brainstorm ways to solve team and advertiser challenges using your knowledge and partnership",
+        "cn_sop_s2_ccm": "- Keep up daily syncs\n- Shadow CMs as they open assignments\n- Transition to **QA-only role** for assignments\n- Lean on your CM during team calls to speak to updates, contingencies, blockers\n- Brainstorm projects alongside your CM — **this is an expected outcome of your partnership**\n  - What problems could you solve?\n  - Where could you use your strengths to make improvements?",
+        "cn_sop_s2_cm": "- Open and complete assignments independently — CCM continues QA\n- Proactively communicate blockers and potential issues directly to Account Team\n- Work with AM and AE for guidance wherever applicable\n- Participate in internal account team meetings and provide updates on assignment/campaign statuses\n- Brainstorm projects alongside your CCM — **this is an expected outcome of your partnership**\n  - What problems could you solve?\n  - Where could you use your strengths to make improvements?",
+        "cn_sop_s3_practice": "- **CM executes and self-QAs all assignments** — CSU, Optimization, and Trafficking\n- Standing calls / working sessions are recommended but no longer required\n- CM is a vocal, independent member of the Account Team\n- CM proactively tracks upcoming launches and live order health\n- CM communicates gaps, needs, and deadlines regularly — without being asked\n- CM begins coaching teammates on workflows, workarounds, and best practices\n- Both partners collaborate on projects and initiatives together\n- CCM continues to handle all creative development and communicates nuances with CM\n- CCM provides strategic guidance and supports CM development",
+        "cn_sop_client_facing_title": "🎙️ Client-Facing CMs",
+        "cn_sop_client_facing": "CMs with client-facing experience **can and should** own communications related to their workflow (i.e. go-live confirmations, confirming receipt of tags and trackers, etc.).\n\nThe decision to take on this responsibility **must be mutual**. If the CM expresses interest and does not have previous experience, CCMs should work with them to ensure all guidelines and boundaries are known.\n\n**Highly recommended:** Create an advertiser communication template for this purpose. The CCM remains the strategic lead of all advertiser communications.",
+        "cn_checklist_title": "### ✅ Integration Alignment Checklist",
+        "cn_checklist_caption": "Showing checklist for: **{}** — progress is saved locally.",
+        "cn_checklist_complete": "{}/{} milestones completed for {}",
+        "cn_checklist_s1": [
+            "Initial introduction call with CCM completed",
+            "Daily sync cadence established (morning + afternoon recommended)",
+            "Added to account team Slack channels",
+            "Added to weekly account team syncs / pod calls",
+            "Added to account email distribution list",
+            "Salesforce access confirmed — can view and execute assignments",
+            "Regular syncs with CCM established or scheduled for the future",
+        ],
+        "cn_checklist_s2": [
+            "Opened and completed at least one assignment independently",
+            "CCM has transitioned to QA-only role for your assignments",
+            "Actively providing updates in account team meetings",
+            "Identified at least one project or initiative with CCM",
+        ],
+        "cn_checklist_s3": [
+            "Self-QA'ing all assignments — no external review needed",
+            "Full ownership of CSU, Optimization, and Trafficking workflows",
+            "Proactively tracking upcoming launches and live orders",
+            "Teaching or coaching teammates on workflows or workarounds",
+        ],
         # -- Communication Decision Tree --
         "cdt_title": "Communication Decision Tree",
         "cdt_subtitle": "Situation-based routing. Find your scenario, follow the path.",
@@ -120,7 +250,53 @@ LANG = {
             ["Error or risk notification", "Slack DM to CCM", "Direct, private, allows CCM to decide next steps"],
             ["End-of-day summary", "Slack DM to CCM", "Consistent cadence builds trust"],
             ["Client-facing communication (Stage 3)", "Email — using approved template", "Formal, trackable, CCM-aligned"]
+            ["Client-facing communication (Stage 3)", "Email — using approved template", "Formal, trackable, CCM-aligned"]
         ],
+        # -- Comm Tree: Stage-aware content --
+        "cdt_stage_caption": "Showing guidance for: **{}** — change your stage in the sidebar",
+        "cdt_what_happening": "### 📍 What is happening?",
+        "cdt_box_question": "**❓ I have a question**",
+        "cdt_box_blocked": "**🚧 I'm blocked**",
+        "cdt_box_error": "**⚠️ I made an error**",
+        "cdt_box_request": "**📨 Someone asked me something**",
+        "cdt_box_update": "**📊 I need to give an update**",
+        "cdt_blocked_responded": "⏱️ *CCM responded?*",
+        "cdt_blocked_yes": "**Yes →** Follow their lead",
+        "cdt_blocked_no_15": "**No (15 min) →**",
+        "cdt_error_example": '💬 *"Heads up — caught an error on [Title]. [What happened]. Already [fix taken]. Wanted you to know."*',
+        "cdt_request_acknowledge": "📌 **Acknowledge** in their channel",
+        "cdt_update_who": "📌 *Who needs it?*",
+        "cdt_update_ccm_only": "**CCM only →** Slack DM",
+        "cdt_update_full_team": "**Full team →** Account Slack channel",
+        "cdt_update_example": '💬 *"Update on [Title]: [status]. Next step: [plan]. Let me know if anything changes."*',
+        # Stage 1-2 specific
+        "cdt_s12_question_cta": "📌 **Slack DM → CCM**\n\n*Ask in real time. Don't batch.*",
+        "cdt_s12_question_example": '💬 *"Quick question on the [Title] [placement] — [question]. Want to make sure I handle this correctly before submitting."*',
+        "cdt_s1_blocked_escalation": "📌 **Slack CCM again** — note urgency\n\nIf still unresponsive → AdOps mentor",
+        "cdt_s2_blocked_escalation": "📌 **Slack mentor or specialist team**\n+ async msg to CCM",
+        "cdt_s12_blocked_example": '💬 *"Hey — blocked on [issue]. Reaching out to [name] so I don\'t miss SLA. Will update you."*',
+        "cdt_s12_error_cta": "📌 **Slack DM → CCM immediately**\n\n*The moment you find it. Don't wait.*",
+        "cdt_s12_request_flow": "**Then →** Slack CCM before fulfilling\n\n💬 To requester: *\"Got it — let me sync with [CCM].\"*\n\n💬 To CCM: *\"[Name] asked for [request]. Good to proceed?\"*",
+        # Stage 3 specific
+        "cdt_s3_question_cta": "📌 **Use your judgment first**\n\n*You've seen this before. Check your notes, then act.*\n\nIf truly unsure → Slack CCM",
+        "cdt_s3_question_example": '💬 *"Quick question — [question]. I\'m leaning toward [approach]. Good to proceed or am I missing something?"*',
+        "cdt_s3_blocked_escalation": "📌 **Escalate to specialist team**\n+ heads-up to CCM after",
+        "cdt_s3_blocked_example": '💬 *"Blocked on [issue] — escalated to [team]. Letting you know for visibility."*',
+        "cdt_s3_error_cta": "📌 **Assess impact → Slack CCM**\n\n*Pre-PTS: fix it, note it. Post-PTS: flag immediately.*",
+        "cdt_s3_request_flow": "**Handle it →** Do the work, then loop in CCM\n\n💬 To requester: *\"On it — will send shortly.\"*\n\n💬 To CCM (after): *\"FYI — [Name] asked for [request]. Handled and sent.\"*",
+        # Escalation path
+        "cdt_escalation_title": "### 🔺 Escalation Path",
+        "cdt_s12_esc1": "**Step 1 → CCM**\n\nYour CCM is always the first contact if you don't understand something. If unresponsive in the team channel, then Slack DM and note urgency.",
+        "cdt_s12_esc2": "**Step 2 → Escalation**\n\nIf your CCM is unavailable after 15 minutes and the issue is time-sensitive, escalate to the appropriate specialist team or resource. Let your CCM know you escalated.",
+        "cdt_s12_esc3": "**Step 3 → Account Team Lead**\n\nOnly if your CCM and specialist resources are unreachable and there is immediate client-facing risk or SLA breach.",
+        "cdt_s3_esc1": "**Step 1 → Assess & Act**\n\nYou own your workflows. For questions within your scope, use your judgment and act. For anything outside your lane or with client impact, check with your CCM first.",
+        "cdt_s3_esc2": "**Step 2 → Specialist Team or CCM**\n\nIf the issue requires expertise outside your knowledge, escalate to the appropriate specialist team. Give your CCM a heads-up for visibility.",
+        "cdt_s3_esc3": "**Step 3 → Account Team Lead**\n\nOnly if specialist resources are unreachable and there is immediate client-facing risk or SLA breach. You should rarely need this path at Stage 3.",
+        # Urgency signals
+        "cdt_urgency_title": "### 🚨 Urgency Signals to Recognize",
+        "cdt_urgency_emoji": "**Emoji signals:**\n- :alert: or :boom: = immediate action\n- ✅ 👀 🫡 = standard acknowledgment",
+        "cdt_urgency_time": "**Time anchors:**\n- \"goes live tonight\"\n- \"launching in 8 days\"\n- \"ASAP today\" / \"by EOD\"",
+        "cdt_urgency_doubt": "**When in doubt:**\n- Ask → is this urgent or FYI?\n- Check SLA timing\n- Default to proactive over silent",
         # -- Prioritization Framework --
         "pf_title": "Prioritization Framework",
         "pf_subtitle": "Five principles for deciding what to work on when everything feels urgent.",
@@ -209,7 +385,7 @@ LANG = {
         "home_tagline": "Todo lo que necesitas para trabajar con claridad, consistencia y confianza — en un solo lugar.",
         "home_footer": "Diseñado para CMs en Model 2. Tu referencia desde Stage 1 hasta Stage 3.",
         # -- Campaign Navigation --
-        "cn_title": "Navegación de Campaña",
+         "cn_title": "Navegando R&Rs de Campaña",
         "cn_subtitle": "Tu referencia para saber cuándo actuar de forma independiente y cuándo consultar.",
         "cn_ask_title": "🔵 PREGUNTAR",
         "cn_ask_when": "**Cuándo Preguntar**",
@@ -254,7 +430,134 @@ LANG = {
             "Nunca cambies asignaciones de presupuesto sin dirección explícita",
             "Nunca uses el estado 'Blocked - CCM' sin intentar resolverlo directamente primero"
         ],
-        # -- Communication Decision Tree --
+        # -- Campaign Nav: Stage-aware content (ES) --
+        "cn_stage_header": "📍 Estás en: **{}**",
+        "cn_stage_change": "Cambia tu stage en la barra lateral.",
+        "cn_stage1_focus": "Construyendo confianza y estableciendo patrones de comunicación. Tu CCM es tu guía principal.",
+        "cn_stage2_focus": "Estás abriendo y ejecutando assignments de forma independiente. Tu CCM proporciona QA y orientación estratégica.",
+        "cn_stage3_focus": "Tú manejas tus workflows de principio a fin. Tu alianza con tu CCM es colaborativa y estratégica — no supervisora.",
+        "cn_ask_items_s1": [
+            "Primera vez que encuentras un tipo de assignment",
+            "Decisiones o comunicaciones dirigidas al cliente",
+            "Cualquier cosa que involucre cambios de presupuesto o modificaciones de flight",
+            "Cuando las instrucciones son ambiguas o incompletas",
+            "Cuando un creative asset no coincide con lo que describe el assignment",
+            "Cuando no estás seguro/a de las preferencias o historial específico del advertiser",
+        ],
+        "cn_ask_items_s2": [
+            "Tipos de assignment nuevos que no has hecho de forma independiente",
+            "Decisiones dirigidas al cliente o comunicaciones directas con el advertiser",
+            "Cambios de presupuesto, modificaciones de flight o ajustes de inventario",
+            "Cuando las instrucciones son ambiguas y no puedes resolverlo con el SOP o wiki",
+            "Cuando no estás seguro/a del historial o preferencias específicas del advertiser",
+        ],
+        "cn_ask_items_s3": [
+            "Una situación genuinamente nueva — productos nuevos, casos especiales, solicitudes únicas del cliente",
+            "Decisiones estratégicas con impacto directo en el cliente o los ingresos",
+            "Dependencias o conflictos entre cuentas que necesitan alineación",
+            "Situaciones donde el SOP no dice nada o se contradice",
+        ],
+        "cn_ask_who_s1": "**A quién preguntar**: Tu CCM primero. Si no está disponible y es urgente, tu mentor de AdOps o M1.",
+        "cn_ask_who_s2": "**A quién preguntar**: Tu CCM para decisiones estratégicas o del cliente. Para dudas de ejecución, revisa el SOP primero — luego tu CCM o Account Team.",
+        "cn_ask_who_s3": "**A quién preguntar**: Tu Account Team, M1, o CCM — quien tenga el contexto. Tú decides a quién involucrar.",
+        "cn_attempt_items_s1": [
+            "Tipos de assignment que ya completaste con aprobación de QA",
+            "Trafficking estándar para DSP, Devices, STV, PVa",
+            "Optimizations que ya ejecutaste previamente en esta cuenta",
+            "Assignments de CSU que siguen patrones establecidos",
+            "Actualizar el tracker semanal o la production matrix compartida",
+            "Actualizaciones rutinarias por Slack sobre el estado de assignments",
+        ],
+        "cn_attempt_items_s2": [
+            "Todos los tipos de assignment que ya hiciste — ejecuta de forma independiente",
+            "Trafficking estándar, optimizations y workflows de CSU",
+            "Comunicaciones rutinarias al Account Team sobre estado y timelines",
+            "Resolución de problemas de delivery o creative usando el SOP y wiki",
+            "Señalar proactivamente posibles problemas al Account Team",
+        ],
+        "cn_attempt_items_s3": [
+            "Todos los assignments dentro de tu alcance — CSU, Optimization, Trafficking",
+            "Auto-QA todo tu trabajo antes de enviar",
+            "Comunicaciones al Account Team relacionadas con tu workflow — confirmaciones de go-live, recibo de tags, actualizaciones de delivery",
+            "Resolver problemas de delivery de principio a fin",
+            "Orientar a compañeros sobre workflows, soluciones y mejores prácticas",
+            "Rastrear proactivamente próximos lanzamientos y salud de órdenes activas",
+        ],
+        "cn_attempt_who_s1": "**Luego confirma**: Informa a tu CCM lo que hiciste. Tu CCM hará QA.",
+        "cn_attempt_who_s2": "**Luego confirma**: Tu CCM revisa trabajo de alto impacto. La ejecución rutinaria es tuya.",
+        "cn_attempt_who_s3": "**Tú lo manejas.** Ejecuta, haz QA y comunica de forma autónoma. Involucra a tu partner cuando se necesite alineación estratégica.",
+        "cn_escalate_items_s1": [
+            "Llevas más de 15 minutos bloqueado/a sin un camino claro",
+            "Una campaña está en riesgo de no cumplir su fecha de lanzamiento",
+            "Ha ocurrido o puede ocurrir un error visible para el cliente",
+            "Un SLA está en riesgo y no puedes resolver el bloqueo por tu cuenta",
+            "Descubres una discrepancia entre OMS y Rodeo que afecta la entrega",
+            "Tu CCM no está disponible y el problema no puede esperar",
+        ],
+        "cn_escalate_items_s2": [
+            "Llevas más de 15 minutos bloqueado/a sin un camino claro",
+            "Una campaña está en riesgo de no cumplir su fecha de lanzamiento o SLA",
+            "Ha ocurrido o puede ocurrir un error visible para el cliente",
+            "Una discrepancia entre OMS y Rodeo que no puedes resolver",
+            "Tu CCM no está disponible y el problema es urgente",
+        ],
+        "cn_escalate_items_s3": [
+            "Una campaña está en riesgo y no puedes resolverlo de forma independiente",
+            "Ha ocurrido un error visible para el cliente con impacto material",
+            "Un problema requiere coordinación entre cuentas o equipos fuera de tu alcance",
+            "Una decisión necesita visibilidad de M1 o liderazgo por riesgo de ingresos o relación",
+        ],
+        "cn_escalate_who_s1": "**Escalar a**: Tu CCM (primero), luego M1 o líder del Account Team si CCM no está disponible.",
+        "cn_escalate_who_s2": "**Escalar a**: Tu CCM para impacto al cliente. M1 o líder del Account Team si CCM no está disponible.",
+        "cn_escalate_who_s3": "**Escalar a**: Quien tenga la autoridad para resolverlo — M1, líder del Account Team, o tu CCM partner.",
+        "cn_guardrails_s3": [
+            "Nunca modifiques flight dates sin confirmar el impacto en delivery y pacing",
+            "Nunca envíes trabajo sin auto-QA — tú eres tu propia puerta de calidad",
+            "Nunca cambies asignaciones de presupuesto sin dirección explícita del Account Team o AM",
+            "Nunca tomes trabajo de otra cuenta sin confirmar disponibilidad y visibilidad con tu partner",
+        ],
+        "cn_sop_title": "📋 SOP por Stage de Integración",
+        "cn_sop_source": "Del [SOP de Workflow US-SJO — Model 2](https://w.amazon.com/bin/view/Users/ajamitho/CM-UAT-Test/)",
+        "cn_sop_duration": "**Duración:** Aproximadamente 2–3 semanas — el CM dictará según su nivel de confianza",
+        "cn_sop_s1_focus": "**Enfoque:** Construyendo confianza y estableciendo patrones de comunicación.",
+        "cn_sop_s2_focus": "**Enfoque:** Los CMs comienzan a abrir y ejecutar assignments de forma independiente mientras los CCMs continúan guiando y haciendo QA.",
+        "cn_sop_s3_focus": "**Enfoque:** Los CMs asumen la propiedad de sus workflows. Ambos partners deben estar colaborando en proyectos e iniciativas juntos.",
+        "cn_sop_s3_note": "**Para ser claros:** Esta es una **alianza igualitaria y colaborativa** — los CMs no son 'asistentes' de los CCMs, así como los CCMs no son 'asistentes' de los AEs. Trabajamos juntos, siempre.",
+        "cn_sop_ccm_title": "#### Responsabilidades del CCM",
+        "cn_sop_cm_title": "#### Responsabilidades del CM",
+        "cn_sop_s3_practice_title": "#### Cómo Se Ve en la Práctica",
+        "cn_sop_s1_ccm": "- Programar llamada de introducción inicial con el CM\n- Alinear en **cadencia diaria** — bloque de 30–60 min cada mañana y tarde es altamente recomendado\n- Agregar al CM a chats relevantes del account team y syncs semanales\n- Presentar al CM en canales de Slack del Account Team\n- Abrir y asignar tareas vía Salesforce — **empezar con una a la vez** hasta cubrir todos los tipos\n- Que el CM te observe mientras abres assignments; estar en la llamada mientras ejecutan\n- **QA de todos los assignments del CM** (el CM hará self-QA en un stage posterior)\n- CC al CM en comunicaciones con el cliente\n- Dar orientación directa sobre workflow de campaña conforme llegan assignments\n- Compartir experiencias previas y resultados",
+        "cn_sop_s1_cm": "- Completar assignments con la guía de tu CCM\n- Comunicar actualizaciones, preguntas, bloqueos directamente con CCM/Account Team vía Slack\n- Documentar consistentemente aprendizajes clave y procesos\n- Idear formas de resolver desafíos del equipo y advertiser usando tu conocimiento y alianza",
+        "cn_sop_s2_ccm": "- Mantener syncs diarios\n- Observar a los CMs mientras abren assignments\n- Transicionar a **rol de solo-QA** para assignments\n- Apoyarse en tu CM durante llamadas de equipo para hablar de actualizaciones, contingencias, bloqueos\n- Idear proyectos junto con tu CM — **esto es un resultado esperado de tu alianza**\n  - ¿Qué problemas podrían resolver?\n  - ¿Dónde podrían usar sus fortalezas para mejorar?",
+        "cn_sop_s2_cm": "- Abrir y completar assignments de forma independiente — el CCM continúa con QA\n- Comunicar proactivamente bloqueos y posibles problemas al Account Team\n- Trabajar con AM y AE para orientación donde aplique\n- Participar en reuniones internas del account team y dar actualizaciones de estado\n- Idear proyectos junto con tu CCM — **esto es un resultado esperado de tu alianza**\n  - ¿Qué problemas podrían resolver?\n  - ¿Dónde podrían usar sus fortalezas para mejorar?",
+        "cn_sop_s3_practice": "- **El CM ejecuta y hace self-QA de todos los assignments** — CSU, Optimization y Trafficking\n- Llamadas regulares / sesiones de trabajo son recomendadas pero ya no requeridas\n- El CM es un miembro vocal e independiente del Account Team\n- El CM rastrea proactivamente próximos lanzamientos y salud de órdenes activas\n- El CM comunica brechas, necesidades y fechas límite regularmente — sin que se lo pidan\n- El CM comienza a orientar a compañeros sobre workflows, soluciones y mejores prácticas\n- Ambos partners colaboran en proyectos e iniciativas juntos\n- El CCM continúa manejando todo el desarrollo creativo y comunica matices al CM\n- El CCM proporciona orientación estratégica y apoya el desarrollo del CM",
+        "cn_sop_client_facing_title": "🎙️ CMs con Contacto al Cliente",
+        "cn_sop_client_facing": "Los CMs con experiencia de contacto al cliente **pueden y deben** manejar comunicaciones relacionadas con su workflow (ej. confirmaciones de go-live, confirmar recibo de tags y trackers, etc.).\n\nLa decisión de asumir esta responsabilidad **debe ser mutua**. Si el CM expresa interés y no tiene experiencia previa, los CCMs deben asegurarse de que todas las directrices y límites sean conocidos.\n\n**Altamente recomendado:** Crear una plantilla de comunicación con el advertiser para este propósito. El CCM sigue siendo el líder estratégico de todas las comunicaciones con el advertiser.",
+        "cn_checklist_title": "### ✅ Lista de Verificación de Alineación de Integración",
+        "cn_checklist_caption": "Mostrando lista para: **{}** — el progreso se guarda localmente.",
+        "cn_checklist_complete": "{}/{} hitos completados para {}",
+        "cn_checklist_s1": [
+            "Llamada de introducción inicial con CCM completada",
+            "Cadencia diaria de syncs establecida (mañana + tarde recomendado)",
+            "Agregado/a a canales de Slack del account team",
+            "Agregado/a a syncs semanales / llamadas del pod",
+            "Agregado/a a lista de distribución de correo de la cuenta",
+            "Acceso a Salesforce confirmado — puedes ver y ejecutar assignments",
+            "Syncs regulares con CCM establecidos o programados para el futuro",
+        ],
+        "cn_checklist_s2": [
+            "Abrió y completó al menos un assignment de forma independiente",
+            "El CCM ha transicionado a rol de solo-QA para tus assignments",
+            "Proporcionando actualizaciones activamente en reuniones del account team",
+            "Identificado al menos un proyecto o iniciativa con CCM",
+        ],
+        "cn_checklist_s3": [
+            "Haciendo self-QA de todos los assignments — sin revisión externa necesaria",
+            "Propiedad completa de workflows de CSU, Optimization y Trafficking",
+            "Rastreando proactivamente próximos lanzamientos y órdenes activas",
+            "Enseñando u orientando a compañeros sobre workflows o soluciones",
+        ],
+        # -- Communication Decision Tree (ES) --
         "cdt_title": "Árbol de Decisión de Comunicación",
         "cdt_subtitle": "Enrutamiento basado en situaciones. Encuentra tu escenario, sigue el camino.",
         "cdt_channel_title": "📡 Guía de Canales",
@@ -266,7 +569,48 @@ LANG = {
             ["Notificación de error o riesgo", "Slack DM al CCM", "Directo, privado, permite al CCM decidir los siguientes pasos"],
             ["Resumen de fin de día", "Slack DM al CCM", "La cadencia constante construye confianza"],
             ["Comunicación al cliente (Stage 3)", "Email — usando plantilla aprobada", "Formal, rastreable, alineado con el CCM"]
+            ["Comunicación al cliente (Stage 3)", "Email — usando plantilla aprobada", "Formal, rastreable, alineado con el CCM"]
         ],
+        "cdt_stage_caption": "Mostrando guía para: **{}** — cambia tu stage en la barra lateral",
+        "cdt_what_happening": "### 📍 ¿Qué está pasando?",
+        "cdt_box_question": "**❓ Tengo una pregunta**",
+        "cdt_box_blocked": "**🚧 Estoy bloqueado/a**",
+        "cdt_box_error": "**⚠️ Cometí un error**",
+        "cdt_box_request": "**📨 Alguien me pidió algo**",
+        "cdt_box_update": "**📊 Necesito dar una actualización**",
+        "cdt_blocked_responded": "⏱️ *¿Respondió el CCM?*",
+        "cdt_blocked_yes": "**Sí →** Sigue su guía",
+        "cdt_blocked_no_15": "**No (15 min) →**",
+        "cdt_error_example": '💬 *"Aviso — encontré un error en [Título]. [Qué pasó]. Ya [acción tomada]. Quería que supieras."*',
+        "cdt_request_acknowledge": "📌 **Confirma recibo** en su canal",
+        "cdt_update_who": "📌 *¿Quién lo necesita?*",
+        "cdt_update_ccm_only": "**Solo CCM →** Slack DM",
+        "cdt_update_full_team": "**Todo el equipo →** Canal de Slack de la cuenta",
+        "cdt_update_example": '💬 *"Actualización sobre [Título]: [estado]. Siguiente paso: [plan]. Avísenme si algo cambia."*',
+        "cdt_s12_question_cta": "📌 **Slack DM → CCM**\n\n*Pregunta en tiempo real. No acumules.*",
+        "cdt_s12_question_example": '💬 *"Pregunta rápida sobre el [Título] [placement] — [pregunta]. Quiero asegurarme de manejarlo bien antes de enviar."*',
+        "cdt_s1_blocked_escalation": "📌 **Escríbele al CCM de nuevo** — señala urgencia\n\nSi sigue sin responder → Mentor de AdOps",
+        "cdt_s2_blocked_escalation": "📌 **Escríbele al mentor o equipo especialista**\n+ msg asíncrono al CCM",
+        "cdt_s12_blocked_example": '💬 *"Hey — bloqueado/a en [problema]. Contactando a [nombre] para no perder SLA. Te actualizo."*',
+        "cdt_s12_error_cta": "📌 **Slack DM → CCM inmediatamente**\n\n*En el momento que lo encuentres. No esperes.*",
+        "cdt_s12_request_flow": "**Luego →** Escríbele al CCM antes de cumplir\n\n💬 Al solicitante: *\"Recibido — déjame sincronizar con [CCM].\"*\n\n💬 Al CCM: *\"[Nombre] pidió [solicitud]. ¿Puedo proceder?\"*",
+        "cdt_s3_question_cta": "📌 **Usa tu criterio primero**\n\n*Ya has visto esto antes. Revisa tus notas, luego actúa.*\n\nSi realmente no estás seguro/a → Slack CCM",
+        "cdt_s3_question_example": '💬 *"Pregunta rápida — [pregunta]. Me inclino hacia [enfoque]. ¿Puedo proceder o estoy pasando algo por alto?"*',
+        "cdt_s3_blocked_escalation": "📌 **Escala al equipo especialista**\n+ aviso al CCM después",
+        "cdt_s3_blocked_example": '💬 *"Bloqueado/a en [problema] — escalé a [equipo]. Te aviso para visibilidad."*',
+        "cdt_s3_error_cta": "📌 **Evalúa impacto → Slack CCM**\n\n*Pre-PTS: corrígelo, anótalo. Post-PTS: señala inmediatamente.*",
+        "cdt_s3_request_flow": "**Manéjalo →** Haz el trabajo, luego avisa al CCM\n\n💬 Al solicitante: *\"En eso — te lo envío pronto.\"*\n\n💬 Al CCM (después): *\"FYI — [Nombre] pidió [solicitud]. Lo manejé y envié.\"*",
+        "cdt_escalation_title": "### 🔺 Ruta de Escalación",
+        "cdt_s12_esc1": "**Paso 1 → CCM**\n\nTu CCM es siempre el primer contacto si no entiendes algo. Si no responde en el canal del equipo, entonces Slack DM y señala urgencia.",
+        "cdt_s12_esc2": "**Paso 2 → Escalación**\n\nSi tu CCM no está disponible después de 15 minutos y el problema es urgente, escala al equipo especialista o recurso apropiado. Avisa a tu CCM que escalaste.",
+        "cdt_s12_esc3": "**Paso 3 → Líder del Account Team**\n\nSolo si tu CCM y los recursos especialistas no están disponibles y hay riesgo inmediato para el cliente o incumplimiento de SLA.",
+        "cdt_s3_esc1": "**Paso 1 → Evalúa y Actúa**\n\nTú manejas tus workflows. Para preguntas dentro de tu alcance, usa tu criterio y actúa. Para cualquier cosa fuera de tu área o con impacto al cliente, consulta primero con tu CCM.",
+        "cdt_s3_esc2": "**Paso 2 → Equipo Especialista o CCM**\n\nSi el problema requiere experiencia fuera de tu conocimiento, escala al equipo especialista apropiado. Dale visibilidad a tu CCM.",
+        "cdt_s3_esc3": "**Paso 3 → Líder del Account Team**\n\nSolo si los recursos especialistas no están disponibles y hay riesgo inmediato para el cliente o incumplimiento de SLA. Raramente deberías necesitar esta ruta en Stage 3.",
+        "cdt_urgency_title": "### 🚨 Señales de Urgencia a Reconocer",
+        "cdt_urgency_emoji": "**Señales de emoji:**\n- :alert: o :boom: = acción inmediata\n- ✅ 👀 🫡 = confirmación estándar",
+        "cdt_urgency_time": "**Anclas de tiempo:**\n- \"sale en vivo esta noche\"\n- \"lanzamiento en 8 días\"\n- \"ASAP hoy\" / \"para EOD\"",
+        "cdt_urgency_doubt": "**Si tienes dudas:**\n- Pregunta → ¿es urgente o informativo?\n- Revisa timing del SLA\n- Por defecto: proactivo sobre silencioso",
         # -- Prioritization Framework --
         "pf_title": "Marco de Priorización",
         "pf_subtitle": "Cinco principios para decidir en qué trabajar cuando todo se siente urgente.",
@@ -758,6 +1102,15 @@ def render_home():
     # ---- HEADER ----
     st.title("CM Integration Hub")
 
+    # ---- HOSTED vs LOCAL BANNER ----
+    if IS_HOSTED:
+        st.warning(
+            "🌐 **You're viewing the hosted preview.** Browse freely — but notes, confidence checks, "
+            "and checklist progress **will not save** between sessions.\n\n"
+            "To get the full experience with persistent local storage, "
+            "[set up your own copy →](https://github.com/ajamithos/CM-integration-hub#quick-start---local-install)"
+        )
+
     if not alias:
         st.markdown("")
         st.markdown("### 👋 Welcome to the CM Integration Hub")
@@ -796,7 +1149,8 @@ def render_home():
     # ============================================================
     # WHERE YOU ARE — progress bar + summary stats
     # ============================================================
-    st.markdown("### 📍 Where You Are")
+    stage_short = {1: "Building Trust", 2: "Becoming Independent", 3: "Full Integration"}
+    st.markdown(f"### 📍 Where You Are — Stage {stage_num}: {stage_short[stage_num]}")
 
     # Stage progress bar
     progress_pct = (stage_num - 1) / 2.0  # 0.0 for Stage 1, 0.5 for Stage 2, 1.0 for Stage 3
@@ -1096,18 +1450,18 @@ def render_campaign_navigation():
     if "Stage 1" in global_stage:
         stage_num = 1
         stage_label = "Stage 1 — Building Trust"
-        stage_focus = "Building trust and establishing communication patterns. Your CCM is your primary guide."
+        stage_focus = t("cn_stage1_focus")
     elif "Stage 2" in global_stage:
         stage_num = 2
         stage_label = "Stage 2 — Becoming Independent"
-        stage_focus = "You are opening and executing assignments independently. Your CCM provides QA and strategic guidance."
+        stage_focus = t("cn_stage2_focus")
     else:
         stage_num = 3
         stage_label = "Stage 3 — Full Integration"
-        stage_focus = "You own your workflows end-to-end. Your partnership with your CCM is collaborative and strategic — not supervisory."
+        stage_focus = t("cn_stage3_focus")
 
-    st.markdown(f"### 📍 You are in: **{stage_label}**")
-    st.caption(stage_focus + " — Change your stage in the sidebar.")
+    st.markdown(f"### {t('cn_stage_header').format(stage_label)}")
+    st.caption(stage_focus + " — " + t("cn_stage_change"))
     st.markdown("")
 
     # ============================================================
@@ -1116,93 +1470,17 @@ def render_campaign_navigation():
     col1, col2, col3 = st.columns(3)
 
     # --- STAGE-SPECIFIC ASK ITEMS ---
-    if stage_num == 1:
-        ask_items = [
-            "First time encountering an assignment type",
-            "Client-facing decisions or communications",
-            "Anything involving budget changes or flight modifications",
-            "When instructions are ambiguous or incomplete",
-            "When a creative asset does not match what the assignment describes",
-            "When you are unsure about an advertiser's specific preferences or history",
-        ]
-        ask_who = "**Who to ask**: Your CCM first. If they are unavailable and it is time-sensitive, your AdOps mentor or M1."
-    elif stage_num == 2:
-        ask_items = [
-            "New assignment types you have not done independently yet",
-            "Client-facing decisions or direct advertiser communications",
-            "Budget changes, flight modifications, or inventory adjustments",
-            "When instructions are ambiguous and you cannot resolve with the SOP or wiki",
-            "When you are unsure about an advertiser's specific history or preferences",
-        ]
-        ask_who = "**Who to ask**: Your CCM for strategic or client-facing decisions. For execution questions, check the SOP first — then your CCM or Account Team."
-    else:  # Stage 3
-        ask_items = [
-            "A genuinely new situation you have not encountered before — novel products, edge cases, unique client requests",
-            "Strategic decisions with direct client or revenue impact",
-            "Cross-account dependencies or conflicts that need alignment",
-            "Situations where the SOP is silent or contradictory",
-        ]
-        ask_who = "**Who to ask**: Your Account Team, M1, or CCM — whoever has the context. You decide who to loop in."
+    stage_suffix = f"s{stage_num}"
+    ask_items = t(f"cn_ask_items_{stage_suffix}")
+    ask_who = t(f"cn_ask_who_{stage_suffix}")
 
     # --- STAGE-SPECIFIC ATTEMPT ITEMS ---
-    if stage_num == 1:
-        attempt_items = [
-            "Assignment types you have completed before with QA approval",
-            "Standard trafficking for DSP, Devices, STV, PVa",
-            "Optimizations you have executed previously on this account",
-            "CSU assignments that follow established patterns",
-            "Updating the weekly tracker or shared production matrix",
-            "Routine Slack updates on assignment status",
-        ]
-        attempt_who = "**Then confirm**: Let your CCM know what you did. Your CCM will QA."
-    elif stage_num == 2:
-        attempt_items = [
-            "All assignment types you have done before — execute independently",
-            "Standard trafficking, optimizations, and CSU workflows",
-            "Routine account team communications about status and timelines",
-            "Troubleshooting delivery or creative issues using the SOP and wiki",
-            "Proactively flagging potential issues to Account Team",
-        ]
-        attempt_who = "**Then confirm**: Your CCM reviews high-stakes work. Routine execution is yours."
-    else:  # Stage 3
-        attempt_items = [
-            "All assignments within your workflow scope — CSU, Optimization, Trafficking",
-            "Self-QA all your own work before submission",
-            "Account team communications related to your workflow — go-live confirmations, tag receipt, delivery updates",
-            "Troubleshooting and resolving delivery issues end-to-end",
-            "Coaching teammates on workflows, workarounds, and best practices",
-            "Proactively tracking upcoming launches and live order health",
-        ]
-        attempt_who = "**You own it.** Execute, QA, and communicate autonomously. Loop in your partner when strategic alignment is needed."
+    attempt_items = t(f"cn_attempt_items_{stage_suffix}")
+    attempt_who = t(f"cn_attempt_who_{stage_suffix}")
 
     # --- STAGE-SPECIFIC ESCALATE ITEMS ---
-    if stage_num == 1:
-        escalate_items = [
-            "You have been blocked for 15+ minutes with no clear path forward",
-            "A campaign is at risk of missing its launch date",
-            "A client-facing error has occurred or may occur",
-            "An SLA is at risk and you cannot resolve the blocker yourself",
-            "You discover a discrepancy between OMS and Rodeo that affects delivery",
-            "Your CCM is unavailable and the issue cannot wait",
-        ]
-        escalate_who = "**Escalate to**: Your CCM (first), then M1 or Account Team lead if CCM is unavailable."
-    elif stage_num == 2:
-        escalate_items = [
-            "You have been blocked for 15+ minutes with no clear path forward",
-            "A campaign is at risk of missing its launch date or SLA",
-            "A client-facing error has occurred or may occur",
-            "A discrepancy between OMS and Rodeo that you cannot resolve",
-            "Your CCM is unavailable and the issue is time-sensitive",
-        ]
-        escalate_who = "**Escalate to**: Your CCM for client impact. M1 or Account Team lead if CCM is unavailable."
-    else:  # Stage 3
-        escalate_items = [
-            "A campaign is at risk and you cannot resolve it independently",
-            "A client-facing error with material impact has occurred",
-            "An issue requires cross-account or cross-team coordination beyond your scope",
-            "A decision needs M1 or leadership visibility due to revenue or relationship risk",
-        ]
-        escalate_who = "**Escalate to**: Whoever has the authority to resolve it — M1, Account Team lead, or your CCM partner."
+    escalate_items = t(f"cn_escalate_items_{stage_suffix}")
+    escalate_who = t(f"cn_escalate_who_{stage_suffix}")
 
     with col1:
         st.markdown(f"### {t('cn_ask_title')}")
@@ -1237,14 +1515,7 @@ def render_campaign_navigation():
         for item in t("cn_guardrails_items"):
             st.markdown(f"🚫 {item}")
     else:
-        # Stage 3 guardrails — reflect ownership
-        stage3_guardrails = [
-            "Never modify flight dates without confirming the downstream impact on delivery and pacing",
-            "Never submit work without self-QA — you are your own quality gate",
-            "Never change budget allocations without explicit direction from Account Team or AM",
-            "Never take on cross-account work without confirming bandwidth and visibility with your partner",
-        ]
-        for item in stage3_guardrails:
+        for item in t("cn_guardrails_s3"):
             st.markdown(f"🚫 {item}")
 
     st.divider()
@@ -1252,108 +1523,56 @@ def render_campaign_navigation():
     # ============================================================
     # SOP BY STAGE — Stage-specific responsibilities from the Workflow SOP
     # ============================================================
-    st.markdown("### 📋 SOP by Stage of Integration")
-    st.caption("From the [US-SJO Workflow SOP — Model 2](https://w.amazon.com/bin/view/Users/ajamitho/CM-UAT-Test/)")
+    st.markdown(f"### {t('cn_sop_title')}")
+    st.caption(t("cn_sop_source"))
 
     if stage_num == 1:
-        st.markdown("**Duration:** Roughly 2–3 weeks — the CM will dictate based on confidence level")
-        st.markdown("**Focus:** Building trust and establishing communication patterns.")
+        st.markdown(t("cn_sop_duration"))
+        st.markdown(t("cn_sop_s1_focus"))
         st.markdown("")
 
         ccm_col, cm_col = st.columns(2)
         with ccm_col:
-            st.markdown("#### CCM Responsibilities")
-            st.markdown(
-                "- Schedule initial introduction call with CM\n"
-                "- Align on **daily cadence** — 30–60 min block each morning and afternoon is highly recommended\n"
-                "- Add CM to relevant account team chats and weekly syncs\n"
-                "- Introduce CM in Account Team Slack channels\n"
-                "- Open and assign tasks via Salesforce — **start with one at a time** until all types are covered\n"
-                "- Have the CM shadow you as you open assignments; be on the call as they execute\n"
-                "- **QA all CM assignments** (CM will self-QA in a later stage)\n"
-                "- CC your CM in client communications\n"
-                "- Provide direct guidance on campaign workflow as assignments come in and issues arise\n"
-                "- Talk through previous experiences and outcomes"
-            )
+            st.markdown(t("cn_sop_ccm_title"))
+            st.markdown(t("cn_sop_s1_ccm"))
         with cm_col:
-            st.markdown("#### CM Responsibilities")
-            st.markdown(
-                "- Complete assignments with your CCM's guidance\n"
-                "- Communicate updates, questions, blockers directly with CCM/Account Team via Slack\n"
-                "- Consistently document key learnings and processes\n"
-                "- Brainstorm ways to solve team and advertiser challenges using your knowledge and partnership"
-            )
+            st.markdown(t("cn_sop_cm_title"))
+            st.markdown(t("cn_sop_s1_cm"))
 
     elif stage_num == 2:
-        st.markdown("**Duration:** Roughly 2–3 weeks — your CM will dictate via their confidence level")
-        st.markdown("**Focus:** CMs begin opening and executing assignments independently while CCMs continue to guide and QA.")
+        st.markdown(t("cn_sop_duration"))
+        st.markdown(t("cn_sop_s2_focus"))
         st.markdown("")
 
         ccm_col, cm_col = st.columns(2)
         with ccm_col:
-            st.markdown("#### CCM Responsibilities")
-            st.markdown(
-                "- Keep up daily syncs\n"
-                "- Shadow CMs as they open assignments\n"
-                "- Transition to **QA-only role** for assignments\n"
-                "- Lean on your CM during team calls to speak to updates, contingencies, blockers\n"
-                "- Brainstorm projects alongside your CM — **this is an expected outcome of your partnership**\n"
-                "  - What problems could you solve?\n"
-                "  - Where could you use your strengths to make improvements?"
-            )
+            st.markdown(t("cn_sop_ccm_title"))
+            st.markdown(t("cn_sop_s2_ccm"))
         with cm_col:
-            st.markdown("#### CM Responsibilities")
-            st.markdown(
-                "- Open and complete assignments independently — CCM continues QA\n"
-                "- Proactively communicate blockers and potential issues directly to Account Team\n"
-                "- Work with AM and AE for guidance wherever applicable\n"
-                "- Participate in internal account team meetings and provide updates on assignment/campaign statuses\n"
-                "- Brainstorm projects alongside your CCM — **this is an expected outcome of your partnership**\n"
-                "  - What problems could you solve?\n"
-                "  - Where could you use your strengths to make improvements?"
-            )
+            st.markdown(t("cn_sop_cm_title"))
+            st.markdown(t("cn_sop_s2_cm"))
 
     else:  # Stage 3
-        st.markdown("**Duration:** 2–3 weeks — the CM will dictate based on confidence level")
-        st.markdown("**Focus:** CMs assume ownership of their workflows. Both partners should be engaging in projects or initiatives together.")
-        st.info(
-            "**To be clear:** This is an **equal and collaborative partnership** — CMs are not 'assistants' to CCMs, "
-            "just as CCMs are not 'assistants' to AEs. We work together, always."
-        )
+        st.markdown(t("cn_sop_duration"))
+        st.markdown(t("cn_sop_s3_focus"))
+        st.info(t("cn_sop_s3_note"))
         st.markdown("")
 
         # Stage 3: single unified column — it's a partnership, not a split
-        st.markdown("#### What This Looks Like in Practice")
-        st.markdown(
-            "- **CM executes and self-QAs all assignments** — CSU, Optimization, and Trafficking\n"
-            "- Standing calls / working sessions are recommended but no longer required\n"
-            "- CM is a vocal, independent member of the Account Team\n"
-            "- CM proactively tracks upcoming launches and live order health\n"
-            "- CM communicates gaps, needs, and deadlines regularly — without being asked\n"
-            "- CM begins coaching teammates on workflows, workarounds, and best practices\n"
-            "- Both partners collaborate on projects and initiatives together\n"
-            "- CCM continues to handle all creative development and communicates nuances with CM\n"
-            "- CCM provides strategic guidance and supports CM development"
-        )
+        st.markdown(t("cn_sop_s3_practice_title"))
+        st.markdown(t("cn_sop_s3_practice"))
 
         st.markdown("")
-        with st.expander("🎙️ Client-Facing CMs"):
-            st.markdown(
-                "CMs with client-facing experience **can and should** own communications related to their workflow "
-                "(i.e. go-live confirmations, confirming receipt of tags and trackers, etc.).\n\n"
-                "The decision to take on this responsibility **must be mutual**. If the CM expresses interest and does "
-                "not have previous experience, CCMs should work with them to ensure all guidelines and boundaries are known.\n\n"
-                "**Highly recommended:** Create an advertiser communication template for this purpose. "
-                "The CCM remains the strategic lead of all advertiser communications."
-            )
+        with st.expander(t("cn_sop_client_facing_title")):
+            st.markdown(t("cn_sop_client_facing"))
 
     st.divider()
 
     # ============================================================
     # CCM-CM ALIGNMENT CHECKLIST — stage-specific (not cumulative)
     # ============================================================
-    st.markdown("### ✅ Integration Alignment Checklist")
-    st.caption(f"Showing checklist for: **{stage_label}** — progress is saved locally.")
+    st.markdown(t("cn_checklist_title"))
+    st.caption(t("cn_checklist_caption").format(stage_label))
 
     # Load/save checklist state
     user_dir = get_user_dir()
@@ -1364,38 +1583,22 @@ def render_campaign_navigation():
     else:
         checklist_state = {}
 
-    # Stage-specific checklist items — only show items for the CURRENT stage
-    stage_1_items = [
-        ("s1_intro_call", "Initial introduction call with CCM completed"),
-        ("s1_daily_cadence", "Daily sync cadence established (morning + afternoon recommended)"),
-        ("s1_slack_channels", "Added to account team Slack channels"),
-        ("s1_weekly_syncs", "Added to weekly account team syncs / pod calls"),
-        ("s1_email_distro", "Added to account email distribution list"),
-        ("s1_sf_access", "Salesforce access confirmed — can view and execute assignments"),
-        ("s1_regular_syncs", "Regular syncs with CCM established or scheduled for the future"),
-    ]
+    # Stage-specific checklist items — pull labels from translation dict
+    checklist_keys_s1 = ["s1_intro_call", "s1_daily_cadence", "s1_slack_channels", "s1_weekly_syncs", "s1_email_distro", "s1_sf_access", "s1_regular_syncs"]
+    checklist_keys_s2 = ["s2_open_independently", "s2_ccm_qa_only", "s2_team_call_updates", "s2_project_brainstorm"]
+    checklist_keys_s3 = ["s3_self_qa", "s3_full_ownership", "s3_proactive_tracking", "s3_coaching"]
 
-    stage_2_items = [
-        ("s2_open_independently", "Opened and completed at least one assignment independently"),
-        ("s2_ccm_qa_only", "CCM has transitioned to QA-only role for your assignments"),
-        ("s2_team_call_updates", "Actively providing updates in account team meetings"),
-        ("s2_project_brainstorm", "Identified at least one project or initiative with CCM"),
-    ]
-
-    stage_3_items = [
-        ("s3_self_qa", "Self-QA'ing all assignments — no external review needed"),
-        ("s3_full_ownership", "Full ownership of CSU, Optimization, and Trafficking workflows"),
-        ("s3_proactive_tracking", "Proactively tracking upcoming launches and live orders"),
-        ("s3_coaching", "Teaching or coaching teammates on workflows or workarounds"),
-    ]
-
-    # Show ONLY the current stage's items
     if stage_num == 1:
-        items_to_show = stage_1_items
+        checklist_keys = checklist_keys_s1
+        checklist_labels = t("cn_checklist_s1")
     elif stage_num == 2:
-        items_to_show = stage_2_items
+        checklist_keys = checklist_keys_s2
+        checklist_labels = t("cn_checklist_s2")
     else:
-        items_to_show = stage_3_items
+        checklist_keys = checklist_keys_s3
+        checklist_labels = t("cn_checklist_s3")
+
+    items_to_show = list(zip(checklist_keys, checklist_labels))
 
     changed = False
     for key, label in items_to_show:
@@ -1414,7 +1617,7 @@ def render_campaign_navigation():
     completed = sum(1 for key, _ in items_to_show if checklist_state.get(key, False))
     total = len(items_to_show)
     st.progress(completed / total if total > 0 else 0)
-    st.caption(f"{completed}/{total} milestones completed for {stage_label}")
+    st.caption(t("cn_checklist_complete").format(completed, total, stage_label))
 
 
 def render_communication_tree():
@@ -1432,37 +1635,37 @@ def render_communication_tree():
     else:
         stage_num = 3
 
-    st.caption(f"Showing guidance for: **{global_stage}** — change your stage in the sidebar")
+    st.caption(t("cdt_stage_caption").format(global_stage))
     st.divider()
 
     # ============================================================
     # VISUAL DECISION TREE — boxed columns, stage-aware
     # ============================================================
 
-    st.markdown("### 📍 What is happening?")
+    st.markdown(t("cdt_what_happening"))
     st.markdown("")
 
     # Stage-aware language maps
     if stage_num <= 2:
-        question_cta = "📌 **Slack DM → CCM**\n\n*Ask in real time. Don't batch.*"
-        question_example = '💬 *"Quick question on the [Title] [placement] — [question]. Want to make sure I handle this correctly before submitting."*'
-        blocked_escalation = "📌 **Slack mentor or specialist team**\n+ async msg to CCM" if stage_num == 2 else "📌 **Slack CCM again** — note urgency\n\nIf still unresponsive → AdOps mentor"
-        blocked_example = '💬 *"Hey — blocked on [issue]. Reaching out to [name] so I don\'t miss SLA. Will update you."*'
-        error_cta = "📌 **Slack DM → CCM immediately**\n\n*The moment you find it. Don't wait.*"
-        request_flow = "**Then →** Slack CCM before fulfilling\n\n💬 To requester: *\"Got it — let me sync with [CCM].\"*\n\n💬 To CCM: *\"[Name] asked for [request]. Good to proceed?\"*"
+        question_cta = t("cdt_s12_question_cta")
+        question_example = t("cdt_s12_question_example")
+        blocked_escalation = t("cdt_s2_blocked_escalation") if stage_num == 2 else t("cdt_s1_blocked_escalation")
+        blocked_example = t("cdt_s12_blocked_example")
+        error_cta = t("cdt_s12_error_cta")
+        request_flow = t("cdt_s12_request_flow")
     else:  # Stage 3
-        question_cta = "📌 **Use your judgment first**\n\n*You've seen this before. Check your notes, then act.*\n\nIf truly unsure → Slack CCM"
-        question_example = '💬 *"Quick question — [question]. I\'m leaning toward [approach]. Good to proceed or am I missing something?"*'
-        blocked_escalation = "📌 **Escalate to specialist team**\n+ heads-up to CCM after"
-        blocked_example = '💬 *"Blocked on [issue] — escalated to [team]. Letting you know for visibility."*'
-        error_cta = "📌 **Assess impact → Slack CCM**\n\n*Pre-PTS: fix it, note it. Post-PTS: flag immediately.*"
-        request_flow = "**Handle it →** Do the work, then loop in CCM\n\n💬 To requester: *\"On it — will send shortly.\"*\n\n💬 To CCM (after): *\"FYI — [Name] asked for [request]. Handled and sent.\"*"
+        question_cta = t("cdt_s3_question_cta")
+        question_example = t("cdt_s3_question_example")
+        blocked_escalation = t("cdt_s3_blocked_escalation")
+        blocked_example = t("cdt_s3_blocked_example")
+        error_cta = t("cdt_s3_error_cta")
+        request_flow = t("cdt_s3_request_flow")
 
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         st.container(border=True).markdown(f"""
-**❓ I have a question**
+{t("cdt_box_question")}
 
 ⬇
 
@@ -1473,15 +1676,15 @@ def render_communication_tree():
 
     with col2:
         st.container(border=True).markdown(f"""
-**🚧 I'm blocked**
+{t("cdt_box_blocked")}
 
 ⬇
 
-⏱️ *CCM responded?*
+{t("cdt_blocked_responded")}
 
-**Yes →** Follow their lead
+{t("cdt_blocked_yes")}
 
-**No (15 min) →**
+{t("cdt_blocked_no_15")}
 {blocked_escalation}
 
 {blocked_example}
@@ -1489,87 +1692,63 @@ def render_communication_tree():
 
     with col3:
         st.container(border=True).markdown(f"""
-**⚠️ I made an error**
+{t("cdt_box_error")}
 
 ⬇
 
 {error_cta}
 
-💬 *"Heads up — caught an error on [Title]. [What happened]. Already [fix taken]. Wanted you to know."*
+{t("cdt_error_example")}
 """)
 
     with col4:
         st.container(border=True).markdown(f"""
-**📨 Someone asked me something**
+{t("cdt_box_request")}
 
 ⬇
 
-📌 **Acknowledge** in their channel
+{t("cdt_request_acknowledge")}
 
 {request_flow}
 """)
 
     with col5:
-        st.container(border=True).markdown("""
-**📊 I need to give an update**
+        st.container(border=True).markdown(f"""
+{t("cdt_box_update")}
 
 ⬇
 
-📌 *Who needs it?*
+{t("cdt_update_who")}
 
-**CCM only →** Slack DM
+{t("cdt_update_ccm_only")}
 
-**Full team →** Account Slack channel
+{t("cdt_update_full_team")}
 
-💬 *"Update on [Title]: [status]. Next step: [plan]. Let me know if anything changes."*
+{t("cdt_update_example")}
 """)
 
     st.divider()
 
     # -- ESCALATION PATH — stage-aware --
-    st.markdown("### 🔺 Escalation Path")
+    st.markdown(t("cdt_escalation_title"))
     st.markdown("")
 
     esc1, esc2, esc3 = st.columns(3)
 
     if stage_num <= 2:
         with esc1:
-            st.info("""
-**Step 1 → CCM**
-
-Your CCM is always the first contact if you don't understand something. If unresponsive in the team channel, then Slack DM and note urgency.
-""")
+            st.info(t("cdt_s12_esc1"))
         with esc2:
-            st.warning("""
-**Step 2 → Escalation**
-
-If your CCM is unavailable after 15 minutes and the issue is time-sensitive, escalate to the appropriate specialist team or resource. Let your CCM know you escalated.
-""")
+            st.warning(t("cdt_s12_esc2"))
         with esc3:
-            st.error("""
-**Step 3 → Account Team Lead**
-
-Only if your CCM and specialist resources are unreachable and there is immediate client-facing risk or SLA breach.
-""")
+            st.error(t("cdt_s12_esc3"))
     else:  # Stage 3
         with esc1:
-            st.info("""
-**Step 1 → Assess & Act**
-
-You own your workflows. For questions within your scope, use your judgment and act. For anything outside your lane or with client impact, check with your CCM first.
-""")
+            st.info(t("cdt_s3_esc1"))
         with esc2:
-            st.warning("""
-**Step 2 → Specialist Team or CCM**
-
-If the issue requires expertise outside your knowledge, escalate to the appropriate specialist team. Give your CCM a heads-up for visibility.
-""")
+            st.warning(t("cdt_s3_esc2"))
         with esc3:
-            st.error("""
-**Step 3 → Account Team Lead**
-
-Only if specialist resources are unreachable and there is immediate client-facing risk or SLA breach. You should rarely need this path at Stage 3.
-""")
+            st.error(t("cdt_s3_esc3"))
 
     st.divider()
 
@@ -1586,28 +1765,14 @@ Only if specialist resources are unreachable and there is immediate client-facin
     st.divider()
 
     # -- URGENCY SIGNALS --
-    st.markdown("### 🚨 Urgency Signals to Recognize")
+    st.markdown(t("cdt_urgency_title"))
     sig1, sig2, sig3 = st.columns(3)
     with sig1:
-        st.container(border=True).markdown("""
-**Emoji signals:**
-- :alert: or :boom: = immediate action
-- ✅ 👀 🫡 = standard acknowledgment
-""")
+        st.container(border=True).markdown(t("cdt_urgency_emoji"))
     with sig2:
-        st.container(border=True).markdown("""
-**Time anchors:**
-- "goes live tonight"
-- "launching in 8 days"
-- "ASAP today" / "by EOD"
-""")
+        st.container(border=True).markdown(t("cdt_urgency_time"))
     with sig3:
-        st.container(border=True).markdown("""
-**When in doubt:**
-- Ask → is this urgent or FYI?
-- Check SLA timing
-- Default to proactive over silent
-""")
+        st.container(border=True).markdown(t("cdt_urgency_doubt"))
 
 def render_prioritization():
     st.title(t("pf_title"))
