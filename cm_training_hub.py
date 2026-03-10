@@ -2239,7 +2239,7 @@ def render_home():
         st.divider()
         render_m1_analytics()
         st.divider()
-
+        return  # M1 sees Team Analytics only — no IC content below
     if not alias:
         st.markdown("")
         st.markdown("")
@@ -3995,7 +3995,11 @@ def main():
         current = st.session_state.get("current_page", "home")
 
         # -- Navigation --
+        # M1 role only sees Dashboard — IC training tabs are hidden
+        m1_hidden_pages = {"confidence", "campaign", "priority", "comms", "scenarios", "notes", "docs", "progress"}
         for page_key, icon, en_label, es_label in NAV_PAGES:
+            if is_m1_role() and page_key in m1_hidden_pages:
+                continue  # Skip IC-specific pages for M1
             label = es_label if lang == "es" else en_label
 
             if page_key == current:
@@ -4034,6 +4038,12 @@ def main():
                 st.rerun()
     # -- Route to page --
     current_page = st.session_state.get("current_page", "home")
+
+    # M1 route guard — bounce to Dashboard if they land on an IC page
+    m1_blocked = {"confidence", "campaign", "priority", "comms", "scenarios", "notes", "docs", "progress"}
+    if is_m1_role() and current_page in m1_blocked:
+        st.session_state["current_page"] = "home"
+        current_page = "home"
 
     if current_page == "home":
         render_home()
