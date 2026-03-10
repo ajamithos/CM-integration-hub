@@ -250,7 +250,6 @@ LANG = {
             ["Error or risk notification", "Slack DM to CCM", "Direct, private, allows CCM to decide next steps"],
             ["End-of-day summary", "Slack DM to CCM", "Consistent cadence builds trust"],
             ["Client-facing communication (Stage 3)", "Email — using approved template", "Formal, trackable, CCM-aligned"]
-            ["Client-facing communication (Stage 3)", "Email — using approved template", "Formal, trackable, CCM-aligned"]
         ],
         # -- Comm Tree: Stage-aware content --
         "cdt_stage_caption": "Showing guidance for: **{}** — change your stage in the sidebar",
