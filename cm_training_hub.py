@@ -3961,18 +3961,10 @@ def main():
         st.session_state["language"] = lang_options[selected_lang]
 
         st.divider()
-
-        # Alias input — pre-populated from config
-        alias = st.text_input(
-            t("sidebar_alias_label"),
-            value=st.session_state.get("alias", ""),
-            help=t("sidebar_alias_help"),
-            key="alias_input"
-        )
+        # Alias display — locked after setup, read-only
+        alias = st.session_state.get("alias", "")
         if alias:
-            st.session_state["alias"] = alias.strip().lower()
-            st.markdown(t("sidebar_welcome").format(alias))
-
+            st.markdown(f"👤 **{alias}**")
         # Show role badge for M1
         if is_m1_role():
             st.markdown("🔑 **Manager View**")
