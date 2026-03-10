@@ -803,72 +803,6 @@ def load_oneone_topics():
     return ""
 
 
-# ============================================================
-# SHAREPOINT SYNC HELPERS
-# ============================================================
-
-SHAREPOINT_URL = "https://amazon.sharepoint.com/sites/Model2Test/Shared%20Documents/Forms/AllItems.aspx"
-
-def load_sync_config():
-    """Load SharePoint sync config for current user."""
-    user_dir = get_user_dir()
-    config_file = user_dir / "config.json"
-    if config_file.exists():
-        with open(config_file, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-
-def save_sync_config(config):
-    """Save SharePoint sync config for current user."""
-    user_dir = get_user_dir()
-    config_file = user_dir / "config.json"
-    with open(config_file, "w", encoding="utf-8") as f:
-        json.dump(config, f, indent=2)
-
-
-def detect_sync_path():
-    """Auto-detect OneDrive sync path for Model2Test SharePoint library."""
-    alias = st.session_state.get("alias", "")
-    if not alias:
-        return None
-
-    # Common OneDrive sync paths for SharePoint libraries on Windows
-    candidates = [
-        Path.home() / "Amazon" / "Model2Test - Documents",
-        Path.home() / "Amazon" / "Model2Test - Shared Documents",
-        Path.home() / "OneDrive - Amazon" / "Model2Test - Documents",
-        Path.home() / "OneDrive - Amazon" / "Model2Test - Shared Documents",
-        # Jamie's custom folder name
-        Path.home() / "Amazon" / "Model2Test - Jamie Thomas CM Integration Reports",
-        Path.home() / "OneDrive - Amazon" / "Model2Test - Jamie Thomas CM Integration Reports",
-    ]
-    for p in candidates:
-        if p.exists() and p.is_dir():
-            return str(p)
-    return None
-
-
-def save_report_to_sharepoint(report_text, alias):
-    """Save progress report to SharePoint-synced folder. Returns (success, message)."""
-    config = load_sync_config()
-    sync_path = config.get("sharepoint_sync_path", "")
-
-    if not sync_path or not Path(sync_path).exists():
-        return False, "Sync path not configured or folder not found."
-
-    # Create alias subfolder if it doesn't exist
-    alias_folder = Path(sync_path) / alias
-    alias_folder.mkdir(exist_ok=True)
-
-    # Write the report — overwrites each time (living document)
-    report_file = alias_folder / f"progress_report_{alias}.txt"
-    with open(report_file, "w", encoding="utf-8") as f:
-        f.write(report_text)
-
-    return True, str(report_file)
-
-
 def generate_progress_report(history, alias):
     """Generate a comprehensive progress report pulling from all data sources."""
     # Gather all data
@@ -1169,11 +1103,10 @@ def render_home():
     # ---- HOSTED vs LOCAL BANNER ----
     if IS_HOSTED:
         st.info(
-            "🌐 **You're viewing the hosted preview.** This is a read-only demonstration — "
-            "progress, notes, and reports will not persist between sessions.\n\n"
-            "The full experience — including **progress tracking, SharePoint sync, and manager reporting** — "
-            "is available when running locally. "
-            "[Set up your local copy →](https://github.com/ajamithos/CM-integration-hub#quick-start--local-install)"
+            "🌐 You're viewing the hosted preview of this tool for UAT testing. "
+            "Notes, confidence checks, and checklist progress will not save between sessions.\n\n"
+            "The full CM experience is unlocked when engaging with the tool on your local machine — "
+            "[click here to set it up →](https://github.com/ajamithos/CM-integration-hub#quick-start--local-install)"
         )
 
     if not alias:
@@ -1197,9 +1130,9 @@ def render_home():
         )
         st.markdown("")
         st.info(
-            "🔒 **Your data is yours.** Notes, confidence scores, and progress are saved locally "
-            "on your machine. When you\'re ready, you can share your progress report directly "
-            "with your manager through a connected team folder — on your terms, at your pace."
+            "🔒 **Your data stays on your machine.** Notes, confidence scores, and progress — "
+            "all saved locally in a folder on your laptop. Nothing is uploaded, shared, or visible "
+            "to anyone until you share it."
         )
         st.markdown("")
         st.warning(
@@ -2607,8 +2540,8 @@ def render_progress_report():
 
     st.divider()
 
-    # ---- DOWNLOAD & SHARE ----
-    st.markdown("### 📥 Download & Share Your Report")
+    # ---- DOWNLOAD ----
+    st.markdown("### 📥 Download Full Report")
 
     if history:
         report_text = generate_progress_report(history, alias)
@@ -2630,97 +2563,10 @@ def render_progress_report():
 
         with st.expander("👁️ Preview report before downloading"):
             st.code(report_text, language=None)
-
-        st.divider()
-
-        # ============================================================
-        # SHAREPOINT SYNC — Save to Team Folder
-        # ============================================================
-        st.markdown("### 📤 Share with Your Manager")
-        st.markdown(
-            "Save your progress report to the **team SharePoint folder** so your manager "
-            "can track your integration journey. The report updates in place each time you save — "
-            "one living document, always current."
-        )
-
-        config = load_sync_config()
-        sync_path = config.get("sharepoint_sync_path", "")
-
-        if sync_path and Path(sync_path).exists():
-            # ---- SYNC IS SET UP — show the save button ----
-            st.success(f"📂 Connected to: `{sync_path}`")
-
-            col_save, col_change = st.columns([2, 1])
-            with col_save:
-                    success, result_path = save_report_to_sharepoint(report_text, alias)
-                    if success:
-                        st.success(
-                            "✅ **Report saved!** Your manager can now see your latest progress.\n\n"
-                            "📁 Saved to: `" + result_path + "`"
-                        )
-                    else:
-                        st.error("❌ Could not save: " + result_path)
-            with col_change:
-                if st.button("🔧 Change sync path", key="change_sync_path"):
-                    config["sharepoint_sync_path"] = ""
-                    save_sync_config(config)
-                    st.rerun()
-
-        else:
-            # ---- FIRST-TIME SETUP — guide the CM through it ----
-            st.info(
-                "📁 **One-time setup** — Connect your team SharePoint folder so reports "
-                "auto-sync to your manager. Takes about 2 minutes."
-            )
-
-            with st.expander("🔗 Set up SharePoint sync (one-time)", expanded=not bool(sync_path)):
-                st.markdown(
-                    "**Step 1:** Open the team SharePoint folder in your browser:\n\n"
-                    "> [📂 Open CM Integration Reports on SharePoint](" + SHAREPOINT_URL + ")\n\n"
-                    "**Step 2:** Click the **Sync** button at the top of the SharePoint page. "
-                    "OneDrive will create a local folder on your laptop.\n\n"
-                    "**Step 3:** Once the sync is set up, paste the folder path below. "
-                    "You can find it by right-clicking the synced folder → **Copy as path**."
-                )
-
-                # Try auto-detect first
-                detected = detect_sync_path()
-                if detected:
-                    st.success(f"🔍 **Auto-detected:** `{detected}`")
-                    if st.button("✅ Use this path", key="use_detected_path"):
-                        config["sharepoint_sync_path"] = detected
-                        save_sync_config(config)
-                        st.success("✅ Connected! You can now save reports to your team folder.")
-                        st.rerun()
-
-                st.markdown("**Or paste your sync folder path manually:**")
-                manual_path = st.text_input(
-                    "SharePoint sync folder path",
-                    placeholder=r"C:\Users\youralias\Amazon\Model2Test - Documents",
-                    key="manual_sync_path_input",
-                    label_visibility="collapsed"
-                )
-
-                if st.button("💾 Save sync path", key="save_manual_sync_path"):
-                    if manual_path and Path(manual_path).exists():
-                        config["sharepoint_sync_path"] = manual_path
-                        save_sync_config(config)
-                        st.success("✅ Connected! You can now save reports to your team folder.")
-                        st.rerun()
-                    elif manual_path:
-                        st.error(
-                            "❌ That folder doesn't exist on your machine. "
-                            "Make sure you've clicked **Sync** in SharePoint first, "
-                            "then paste the local folder path."
-                        )
-                    else:
-                        st.warning("Please paste a folder path first.")
-
     else:
         st.info(
-            "📊 Complete your first **Confidence Check** to unlock your progress report. "
-            "Once generated, you'll be able to download it and share it directly with your manager "
-            "through the team SharePoint folder."
+            "📊 Complete your first **Confidence Check** to unlock the downloadable report. "
+            "Your checklist, 1:1 topics, and notes will be included automatically."
         )
 
 
@@ -2953,21 +2799,17 @@ def main():
 
     # -- Sidebar --
     with st.sidebar:
-        # Language — defaulted to English per M1 directive.
-        # Spanish translations are preserved in LANG dict and can be re-enabled
-        # by uncommenting the toggle below and removing the hardcoded line.
-        # ---
-        # lang_options = {"English": "en", "Español": "es"}
-        # selected_lang = st.radio(
-        #     t("sidebar_language"),
-        #     options=list(lang_options.keys()),
-        #     index=0 if st.session_state.get("language", "en") == "en" else 1,
-        #     horizontal=True
-        # )
-        # st.session_state["language"] = lang_options[selected_lang]
-        # ---
-        st.session_state["language"] = "en"
+        # Language toggle
+        lang_options = {"English": "en", "Español": "es"}
+        selected_lang = st.radio(
+            t("sidebar_language"),
+            options=list(lang_options.keys()),
+            index=0 if st.session_state.get("language", "en") == "en" else 1,
+            horizontal=True
+        )
+        st.session_state["language"] = lang_options[selected_lang]
 
+        st.divider()
 
         # Alias input
         alias = st.text_input(
