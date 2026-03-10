@@ -1,121 +1,133 @@
-# CM Training Hub
+# CM Integration Hub
 
-A self-contained reference and development tool for Campaign Managers in their first 30 days on-account under Model 2.
+A self-contained integration and reference tool for Campaign Managers in Model 2 — from Stage 1 through Stage 3.
 
-## Features
-
-### ✅ Completed Sections
-
-1. **🏠 Home** - Overview and quick navigation
-2. **📋 Campaign Navigation** - Ask → Attempt → Escalate framework with 15-Minute Rule
-3. **💬 Communication Decision Tree** - Situation-based routing for who/when/how to communicate
-4. **⚡ Prioritization Framework** - Five principles for managing competing priorities
-5. **🎯 Scenario Practice** - 6 interactive flashcard scenarios with:
-   - Real CM/CCM partnership situations
-   - Category tags (Relationship Building, Navigating Ambiguity, Communication Boundaries, etc.)
-   - "Think about it first" prompts
-   - Expandable "Reveal Suggested Approach" sections
-   - Previous/Next navigation
-   - Shuffle functionality
-   - Progress indicator
-6. **📊 Confidence Check** - Self-assessment tool with 8 dimensions and trend tracking
-7. **📝 My Notes** - Personal notepad with local storage and download
-8. **📄 Reference Documents** - Downloadable materials section
-
-### 🌐 Bilingual Support
-
-- Full English / Español translations
-- Toggle in sidebar
-- All content and UI elements localized
-
-## How to Run
-
-### Requirements
-
-- Python 3.8+
-- Streamlit
-
-### Installation
-
-```bash
-# Navigate to the app directory
-cd "C:\Users\ajamitho\Desktop\CM Training Program\CM_Training_Hub"
-
-# Install dependencies (first time only)
-pip install streamlit
-
-# Run the app
-streamlit run cm_training_hub.py
-```
-
-The app will open in your default browser at `http://localhost:8501`
-
-### First-Time Setup
-
-1. **Enter your alias** in the sidebar (e.g., "dcampos")
-2. **Select your language** (English or Español)
-3. **Navigate** using the sidebar menu
-
-## Data Storage
-
-All user data is stored **locally** in the `data/` folder:
-
-- Confidence checks saved as JSON files
-- Notes saved as text files
-- Organized by user alias
-
-**No external servers. No databases. Each CM runs their own copy.**
-
-## Scenario Flashcards
-
-The Scenario Practice section contains 6 cards covering:
-
-1. **First Assignment from Your CCM** (Relationship Building)
-2. **Your CCM and M1 Give Conflicting Direction** (Navigating Ambiguity)
-3. **The Client Asks You Something Directly on a Call** (Communication Boundaries)
-4. **You Trafficked the Wrong Flight Dates** (Trust and Accountability)
-5. **A Teammate Asks You to Cover Their Assignment** (Boundaries and Prioritization)
-6. **Your CCM Is Not Looping You In** (Advocating for Yourself)
-
-### How to Use Scenario Cards
-
-1. **Read the scenario** - Understand the situation
-2. **Think about it first** - Consider your response before revealing the approach
-3. **Click "Reveal Suggested Approach"** - See one way to handle the situation
-4. **Navigate** - Use Previous/Next buttons or Shuffle to randomize order
-
-**No scoring. No right/wrong answers.** The suggested approaches are framed as "one way to handle this" — designed to build judgment, not test knowledge.
-
-## Adding Reference Documents
-
-To add downloadable reference materials:
-
-1. Create a `materials/` folder in the app directory (if it doesn't exist)
-2. Add `.docx`, `.pptx`, `.pdf`, or `.xlsx` files
-3. They will automatically appear in the Reference Documents section
-
-## Customization
-
-All content is in the `LANG` dictionary at the top of `cm_training_hub.py`. To modify:
-
-- **English content**: Edit entries under `"en"`
-- **Spanish content**: Edit entries under `"es"`
-- **Scenario cards**: Edit the `scenario_cards` list in `render_scenarios()`
-
-## Architecture
-
-- **Framework**: Streamlit (single-page app)
-- **Data persistence**: Local JSON and text files
-- **Styling**: Custom CSS for Amazon branding
-- **Navigation**: Radio button sidebar with 8 sections
-- **State management**: Streamlit session state for card navigation
-
-## Support
-
-Built for the SJO AdOps → CM transition under Model 2. For questions or updates, contact Jamie Thomas (ajamitho@).
+Runs on your laptop. No servers. No accounts. No installs beyond Python and Streamlit.
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: March 9, 2026  
-**Built by**: Orcha 🎯
+## Quick Start
+
+### 1. Install Python (one-time)
+
+Download from [python.org](https://www.python.org/downloads/) — check **"Add Python to PATH"** during install.
+
+### 2. Clone this repo
+
+Open Command Prompt (Windows) or Terminal (Mac) and run:
+
+```
+git clone https://github.com/ajamithos/CM-integration-hub.git
+cd CM-integration-hub
+```
+
+### 3. Install Streamlit (one-time)
+
+```
+pip install streamlit
+```
+
+If `pip` doesn't work, try: `python -m pip install streamlit`
+
+### 4. Launch
+
+```
+streamlit run cm_training_hub.py
+```
+
+Your browser opens to `http://localhost:8501`. Enter your alias in the sidebar and go.
+
+### 5. Stop the app
+
+Press `Ctrl+C` in the terminal.
+
+---
+
+## What's Inside
+
+| Page | What It Does |
+|---|---|
+| 🏠 **Dashboard** | Your progress at a glance — stage, confidence avg, scenarios practiced, next steps |
+| 📋 **Campaign Navigation** | Stage-aware Ask / Attempt / Escalate framework, SOP by stage, alignment checklist |
+| 💬 **Communication Tree** | Decision tree for who to contact, what channel, what to say — adapts to your stage |
+| ⚡ **Prioritization** | Five principles for competing priorities |
+| 🎯 **Scenario Practice** | 6 real CM/CCM situations with suggested approaches |
+| 📊 **Confidence Check** | Self-assessment across 8 dimensions with trend tracking |
+| 📈 **Progress Report** | Full integration summary — stage, checklist, confidence, scenarios, 1:1 topics |
+| 📝 **My Notebook** | Notes, 1:1 prep, sync agenda generator |
+| 📄 **Reference Documents** | CM-curated docs and quick links |
+| 🤖 **Ask Zoyla** | AI assistant for campaign questions |
+
+🌐 **Bilingual** — toggle English / Español in the sidebar.
+
+---
+
+## Your Data is 100% Local
+
+Everything you enter (notes, confidence scores, checklist progress) is saved in `data/{your_alias}/` on your laptop. Nothing is uploaded, shared, or visible to anyone until you share it.
+
+---
+
+## For Testers — How to Give Feedback
+
+We're crowdsourcing fine-detail edits before rolling this out to all CMs. Here's how to help:
+
+### Claim a Section
+
+Open the **Feedback Tracker** (shared separately) → go to **Tester Assignments** tab → claim an unclaimed section by adding your name.
+
+### Test Your Section
+
+- Try everything — buttons, links, toggles
+- Switch English ↔ Español
+- Change stages in the sidebar — does the content update?
+- Save data, close the app, reopen — does it persist?
+
+### Log Findings
+
+In the **Feedback Log** tab, one row per finding:
+
+- **Which page/feature?** (be specific)
+- **What's wrong or confusing?**
+- **What should it say/do instead?**
+- **Priority**: P1 (blocker) → P4 (nice-to-have)
+
+### What to Look For
+
+| Find These | Also Valuable |
+|---|---|
+| ❌ Bugs — broken, crashed, error | 😕 UX — confusing flow |
+| 📝 Content — wrong or outdated text | 🤷 Missing — expected but not there |
+| 🇪🇸 Translation — ES labels wrong | ✨ Ideas — "it would be great if..." |
+| 💾 Data — doesn't save or load | 👍 Wins — things you liked! |
+
+---
+
+## Get Latest Updates
+
+After Jamie pushes fixes based on your feedback:
+
+```
+cd CM-integration-hub
+git pull
+```
+
+That's it — you now have the latest version. Relaunch with `streamlit run cm_training_hub.py`.
+
+---
+
+## Common Issues
+
+| Problem | Fix |
+|---|---|
+| `python` not recognized | Reinstall Python, check "Add to PATH" |
+| `pip` not recognized | Use: `python -m pip install streamlit` |
+| Page is blank | Paste `http://localhost:8501` directly in browser |
+| `ModuleNotFoundError` | Run: `pip install streamlit` |
+| Want to stop the app | Press `Ctrl+C` in terminal |
+
+**Still stuck?** Slack **@ajamitho** (Jamie Thomas) with a screenshot.
+
+---
+
+Built for CMs in Model 2. Your reference from Stage 1 through Stage 3.
