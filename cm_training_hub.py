@@ -756,8 +756,7 @@ def render_setup():
             }
             save_hub_config(config)
             st.session_state["alias"] = config["alias"]
-            st.success("✅ Setup complete! Reloading...")
-            st.rerun()
+            st.toast("Setup complete! Loading your hub...")
             st.rerun()
 
     # UAT bypass
@@ -4024,19 +4023,31 @@ def main():
             st.markdown(f"**Role:** {settings_role}")
             st.markdown(f"**Sync Path:** `{settings_sync}`")
 
-        # Reset button OUTSIDE expander — avoids Streamlit expander/button bug
+        # Reset button OUTSIDE expander - avoids Streamlit expander/button bug
         def _do_reset_setup():
+            # 1. Wipe config file so is_setup_complete() returns False
             save_hub_config({})
-            for key in ["alias", "global_stage", "current_page", "_detected_sync_path"]:
+            # 2. Purge ALL app session-state keys (keep Streamlit internals)
+            keys_to_clear = [
+                "alias", "global_stage", "current_page",
+                "language", "last_synced", "sync_warning",
+                "sidebar_stage_select",  # widget key - prevents stale selectbox cache
+                "setup_alias", "setup_role", "setup_m1_code",
+                "setup_sync_path", "_detected_sync_path",
+            ]
+            for key in keys_to_clear:
                 st.session_state.pop(key, None)
 
-        st.button("🔄 Reset Setup", key="reset_setup_btn",
-                  help="Re-run the initial setup (change role, alias, or sync path)",
-                  on_click=_do_reset_setup)
+        if st.button("Reset Setup", key="reset_setup_btn",
+                      help="Re-run the initial setup (change role, alias, or sync path)",
+                      on_click=_do_reset_setup):
+            # Explicit rerun so the setup gate re-evaluates immediately
+            st.rerun()
+
     # -- Route to page --
     current_page = st.session_state.get("current_page", "home")
 
-    # M1 route guard — bounce to Dashboard if they land on an IC page
+    # M1 route guard - bounce to Dashboard if they land on an IC page
     m1_blocked = {"confidence", "campaign", "priority", "comms", "scenarios", "notes", "docs", "progress"}
     if is_m1_role() and current_page in m1_blocked:
         st.session_state["current_page"] = "home"
