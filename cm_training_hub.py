@@ -4012,7 +4012,6 @@ def main():
                     st.caption("✅ Connected to team folder")
             else:
                 st.caption("⚠️ Team folder not found")
-
         # Reset Setup option
         st.divider()
         with st.expander("⚙️ Settings"):
@@ -4024,14 +4023,16 @@ def main():
             st.markdown(f"**Alias:** {settings_alias}")
             st.markdown(f"**Role:** {settings_role}")
             st.markdown(f"**Sync Path:** `{settings_sync}`")
-            st.markdown("---")
-            if st.button("🔄 Reset Setup", key="reset_setup_btn",
-                         help="Re-run the initial setup (change role, alias, or sync path)"):
-                save_hub_config({})
-                for key in ["alias", "global_stage", "current_page", "_detected_sync_path"]:
-                    st.session_state.pop(key, None)
-                st.rerun()
-                st.rerun()
+
+        # Reset button OUTSIDE expander — avoids Streamlit expander/button bug
+        def _do_reset_setup():
+            save_hub_config({})
+            for key in ["alias", "global_stage", "current_page", "_detected_sync_path"]:
+                st.session_state.pop(key, None)
+
+        st.button("🔄 Reset Setup", key="reset_setup_btn",
+                  help="Re-run the initial setup (change role, alias, or sync path)",
+                  on_click=_do_reset_setup)
     # -- Route to page --
     current_page = st.session_state.get("current_page", "home")
 
