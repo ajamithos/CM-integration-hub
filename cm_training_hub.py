@@ -3950,37 +3950,30 @@ def main():
 
     # -- Sidebar --
     with st.sidebar:
-        # Language toggle
-        lang_options = {"English": "en", "Español": "es"}
-        selected_lang = st.radio(
-            t("sidebar_language"),
-            options=list(lang_options.keys()),
-            index=0 if st.session_state.get("language", "en") == "en" else 1,
-            horizontal=True
-        )
-        st.session_state["language"] = lang_options[selected_lang]
+        # Language hardcoded to English — toggle hidden (translations preserved for future)
+        st.session_state["language"] = "en"
 
-        st.divider()
         # Alias display — locked after setup, read-only
         alias = st.session_state.get("alias", "")
         if alias:
             st.markdown(f"👤 **{alias}**")
         # Show role badge for M1
         if is_m1_role():
-            st.markdown("🔑 **Manager View**")
+            st.markdown("🎓 **Manager View**")
 
-        # Global stage selector — persists across all tabs
-        stage_options_sidebar = t("cc_stages")
-        current_global_stage = st.session_state.get("global_stage", stage_options_sidebar[0])
-        if current_global_stage not in stage_options_sidebar:
-            current_global_stage = stage_options_sidebar[0]
-        selected_global_stage = st.selectbox(
-            "📊 Your Current Stage",
-            options=stage_options_sidebar,
-            index=stage_options_sidebar.index(current_global_stage),
-            key="sidebar_stage_select"
-        )
-        st.session_state["global_stage"] = selected_global_stage
+        # Global stage selector — only for CMs, not M1
+        if not is_m1_role():
+            stage_options_sidebar = t("cc_stages")
+            current_global_stage = st.session_state.get("global_stage", stage_options_sidebar[0])
+            if current_global_stage not in stage_options_sidebar:
+                current_global_stage = stage_options_sidebar[0]
+            selected_global_stage = st.selectbox(
+                "📋 Your Current Stage",
+                options=stage_options_sidebar,
+                index=stage_options_sidebar.index(current_global_stage),
+                key="sidebar_stage_select"
+            )
+            st.session_state["global_stage"] = selected_global_stage
 
         st.divider()
         lang = st.session_state.get("language", "en")
@@ -4001,32 +3994,43 @@ def main():
                 # Inactive pages — visible bordered buttons
                 st.button(f"{icon}  {label}", key=f"nav_{page_key}", on_click=navigate_to, args=(page_key,))
 
-        # Sync status in sidebar footer
-        st.divider()
-        config = load_hub_config()
-        if config.get("uat_mode"):
-            st.caption("🧪 UAT Mode — sync disabled")
-        elif get_sync_path():
-            last_synced = st.session_state.get("last_synced")
-            if last_synced:
-                mins_ago = int((datetime.now() - last_synced).total_seconds() / 60)
-                if mins_ago == 0:
-                    st.caption("✅ Synced just now")
+        # Sync status — M1 only (CMs don't need to see sync mechanics)
+        if is_m1_role():
+            st.divider()
+            config = load_hub_config()
+            if config.get("uat_mode"):
+                st.caption("🧪 UAT Mode — sync disabled")
+            elif get_sync_path():
+                last_synced = st.session_state.get("last_synced")
+                if last_synced:
+                    mins_ago = int((datetime.now() - last_synced).total_seconds() / 60)
+                    if mins_ago == 0:
+                        st.caption("✅ Synced just now")
+                    else:
+                        st.caption(f"✅ Synced {mins_ago} min ago")
                 else:
-                    st.caption(f"✅ Synced {mins_ago} min ago")
+                    st.caption("✅ Connected to team folder")
             else:
-                st.caption("✅ Connected to team folder")
-        else:
-            st.caption("⚠️ Team folder not found")
+                st.caption("⚠️ Team folder not found")
 
         # Reset Setup option
         st.divider()
         with st.expander("⚙️ Settings"):
+            # Read from config file (survives refresh), fallback to session state
+            settings_config = load_hub_config()
+            settings_alias = settings_config.get("alias", st.session_state.get("alias", "—"))
+            settings_role = "Manager / Training Lead" if settings_config.get("role") == "m1" else "Campaign Manager (IC)"
+            settings_sync = settings_config.get("sharepoint_sync_path", "Not configured")
+            st.markdown(f"**Alias:** {settings_alias}")
+            st.markdown(f"**Role:** {settings_role}")
+            st.markdown(f"**Sync Path:** `{settings_sync}`")
+            st.markdown("---")
             if st.button("🔄 Reset Setup", key="reset_setup_btn",
                          help="Re-run the initial setup (change role, alias, or sync path)"):
                 save_hub_config({})
                 for key in ["alias", "global_stage", "current_page", "_detected_sync_path"]:
                     st.session_state.pop(key, None)
+                st.rerun()
                 st.rerun()
     # -- Route to page --
     current_page = st.session_state.get("current_page", "home")
